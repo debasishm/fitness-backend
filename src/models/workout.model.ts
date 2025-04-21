@@ -2,15 +2,26 @@ import mongoose from "mongoose";
 
 const workoutSchema = new mongoose.Schema(
   {
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     workoutType: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "WorkoutType",
       required: true,
     },
-    duration: { type: Number, required: true }, // in minutes
-    calories: { type: Number, required: true },
-    date: { type: Date, default: Date.now },
+    number: {
+      type: Number,
+      required: true,
+      description:
+        "Generic metric: steps, reps, laps, etc. depending on workout type.",
+    },
+    date: {
+      type: Date,
+      default: Date.now,
+    },
   },
   { timestamps: true }
 );

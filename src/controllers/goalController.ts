@@ -1,14 +1,14 @@
-import { Request, Response } from 'express';
-import Goal from '../models/goal.model';
-import { AuthRequest } from '../middlewares/auth';
+import { Request, Response } from "express";
+import Goal from "../models/goal.model";
+import { AuthRequest } from "../middlewares/auth";
 
 export const createGoal = async (req: AuthRequest, res: Response) => {
   try {
-    const { goalType, targetValue, startDate, endDate } = req.body;
-
+    const { workoutType, targetValue, startDate, endDate } = req.body;
+    console.log("=========", req.body);
     const goal = await Goal.create({
       user: req.userId,
-      goalType,
+      workoutType,
       targetValue,
       startDate,
       endDate,
@@ -16,18 +16,30 @@ export const createGoal = async (req: AuthRequest, res: Response) => {
 
     res.status(201).json(goal);
   } catch (err) {
-    res.status(500).json({ message: 'Error creating goal', error: err });
+    res.status(500).json({ message: "Error creating goal", error: err });
   }
 };
 
 export const getGoals = async (req: AuthRequest, res: Response) => {
   try {
-    const goals = await Goal.find({ user: req.userId }).sort({ createdAt: -1 });
+    const { goalId } = req.query;
+
+    const filter: any = { user: req.userId };
+
+    if (goalId) {
+      filter._id = goalId;
+    }
+
+    const goals = await Goal.find(filter)
+      .sort({ createdAt: -1 })
+      .populate("workoutType"); // In case you're referencing it
+
     res.status(200).json(goals);
   } catch (err) {
-    res.status(500).json({ message: 'Error fetching goals', error: err });
+    res.status(500).json({ message: "Error fetching goals", error: err });
   }
 };
+
 
 export const updateGoalProgress = async (req: AuthRequest, res: Response) => {
   try {
@@ -36,7 +48,7 @@ export const updateGoalProgress = async (req: AuthRequest, res: Response) => {
 
     const goal = await Goal.findOne({ _id: goalId, user: req.userId });
 
-    if (!goal) return res.status(404).json({ message: 'Goal not found' });
+    if (!goal) return res.status(404).json({ message: "Goal not found" });
 
     goal.currentValue = currentValue;
 
@@ -47,16 +59,16 @@ export const updateGoalProgress = async (req: AuthRequest, res: Response) => {
 
     await goal.save();
 
-    let message = 'Progress updated';
+    let message = "Progress updated";
 
     // Notify if close to goal (≥ 90% of target)
     if (!goal.isAchieved && currentValue >= goal.targetValue * 0.9) {
-      message = 'You’re very close to reaching your goal!';
+      message = "You’re very close to reaching your goal!";
     }
 
     res.status(200).json({ goal, message });
   } catch (err) {
-    res.status(500).json({ message: 'Error updating progress', error: err });
+    res.status(500).json({ message: "Error updating progress", error: err });
   }
 };
 
@@ -66,10 +78,10 @@ export const deleteGoal = async (req: AuthRequest, res: Response) => {
 
     const goal = await Goal.findOneAndDelete({ _id: goalId, user: req.userId });
 
-    if (!goal) return res.status(404).json({ message: 'Goal not found' });
+    if (!goal) return res.status(404).json({ message: "Goal not found" });
 
-    res.status(200).json({ message: 'Goal deleted successfully' });
+    res.status(200).json({ message: "Goal deleted successfully" });
   } catch (err) {
-    res.status(500).json({ message: 'Error deleting goal', error: err });
+    res.status(500).json({ message: "Error deleting goal", error: err });
   }
 };

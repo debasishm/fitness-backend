@@ -2,9 +2,9 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface IGoal extends Document {
   user: mongoose.Types.ObjectId;
-  goalType: "workoutsPerWeek" | "weightGoal";
+  workoutType: mongoose.Types.ObjectId;
   targetValue: number;
-  currentValue?: number;
+  currentValue: number | 0;
   startDate: Date;
   endDate: Date;
   isAchieved: boolean;
@@ -17,9 +17,9 @@ const goalSchema = new Schema<IGoal>(
       ref: "User",
       required: true,
     },
-    goalType: {
-      type: String,
-      enum: ["workoutsPerWeek", "weightGoal"],
+    workoutType: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "WorkoutType",
       required: true,
     },
     targetValue: {
