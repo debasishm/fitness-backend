@@ -94,7 +94,7 @@ router.get("/", getGoals);
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: goalId
  *         required: true
  *         description: Goal ID
  *         schema:
@@ -130,7 +130,7 @@ router.get("/", getGoals);
  *       404:
  *         description: Goal not found
  */
-router.put("/:id", updateGoalProgress);
+router.put("/:goalId", updateGoalProgress);
 
 /**
  * @swagger
@@ -142,7 +142,7 @@ router.put("/:id", updateGoalProgress);
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: goalId
  *         required: true
  *         description: Goal ID
  *         schema:
@@ -163,6 +163,6 @@ router.put("/:id", updateGoalProgress);
  *       404:
  *         description: Goal not found
  */
-router.delete("/:id", deleteGoal);
+router.delete("/:goalId", deleteGoal);
 
 export default router;

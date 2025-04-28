@@ -63,9 +63,22 @@ router.post("/", createWorkout);
  *     tags: [Workouts]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: date
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Filter workouts by date (YYYY-MM-DD)
  *     responses:
  *       200:
  *         description: List of workouts
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Workout'
  */
 router.get("/", getWorkouts);
 

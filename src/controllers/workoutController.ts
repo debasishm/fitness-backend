@@ -51,7 +51,24 @@ export const createWorkout = async (req: AuthRequest, res: Response) => {
 
 export const getWorkouts = async (req: AuthRequest, res: Response) => {
   try {
-    const workouts = await Workout.find({ user: req.userId })
+    const { date } = req.query;
+
+    const query: any = {
+      user: req.userId,
+    };
+
+    if (date && typeof date === "string") {
+      const start = new Date(date);
+      const end = new Date(date);
+      end.setDate(end.getDate() + 1);
+
+      query.date = {
+        $gte: start,
+        $lt: end,
+      };
+    }
+
+    const workouts = await Workout.find(query)
       .populate("workoutType")
       .sort({ date: -1 });
 
@@ -115,4 +132,3 @@ export const getWorkoutById = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
-

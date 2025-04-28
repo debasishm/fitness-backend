@@ -40,33 +40,29 @@ export const getGoals = async (req: AuthRequest, res: Response) => {
   }
 };
 
-
 export const updateGoalProgress = async (req: AuthRequest, res: Response) => {
   try {
     const { goalId } = req.params;
-    const { currentValue } = req.body;
-
+    const { targetValue, workoutType } = req.body;
+    console.log("====================", req.body);
     const goal = await Goal.findOne({ _id: goalId, user: req.userId });
 
-    if (!goal) return res.status(404).json({ message: "Goal not found" });
+    if (!goal) {
+      res.status(404).json({ message: "Goal not found" });
+    } else {
+      goal.targetValue = targetValue;
+      goal.workoutType = workoutType;
+      await goal.save();
 
-    goal.currentValue = currentValue;
+      let message = "Progress updated";
 
-    // Auto-track progress
-    if (currentValue >= goal.targetValue) {
-      goal.isAchieved = true;
+      // Notify if close to goal (≥ 90% of target)
+      // if (!goal.isAchieved && currentValue >= goal.targetValue * 0.9) {
+      //   message = "You’re very close to reaching your goal!";
+      // }
+
+      res.status(200).json({ goal, message });
     }
-
-    await goal.save();
-
-    let message = "Progress updated";
-
-    // Notify if close to goal (≥ 90% of target)
-    if (!goal.isAchieved && currentValue >= goal.targetValue * 0.9) {
-      message = "You’re very close to reaching your goal!";
-    }
-
-    res.status(200).json({ goal, message });
   } catch (err) {
     res.status(500).json({ message: "Error updating progress", error: err });
   }
